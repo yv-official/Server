@@ -1,5 +1,4 @@
 from flask import Blueprint
-from server import db
 
 import server.helpers as helpers
 import server.Models.users as users
@@ -10,7 +9,7 @@ from flask_jwt_extended import jwt_required, jwt_refresh_token_required, get_jwt
 from datetime import datetime, timedelta
 
 # Create blue print for API
-api = Blueprint('api', 'api')
+api = Blueprint('api', 'api', url_prefix='/api')
 
 
 # function for registration
@@ -25,8 +24,7 @@ def register():
         user = helpers.userRegister(username, email, password)
         
         # Add entry in DATABASE 
-        db.session.add(user)
-        db.session.commit()
+        user.save()
 
         # access_token
         access_token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))

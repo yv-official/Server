@@ -1,9 +1,8 @@
 from server import jwt,db
 
 
-class JWTBlacklist(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    jti = db.Column(db.String(200), nullable=False)
+class JWTBlacklist(db.Document):
+    jti = db.StringField()
 
 
 # helpers
@@ -11,12 +10,11 @@ class JWTBlacklist(db.Model):
 # add jti to blacklist 
 def add_jti_blacklist(jti):
     token = JWTBlacklist(jti=jti)
-    db.session.add(token)
-    db.session.commit()
+    token.save()
 
 # check if jti is blacklisted
 def is_jti_blacklisted(jti):
-    res = JWTBlacklist.query.filter_by(jti=jti).first()
+    res = JWTBlacklist.objects(jti=jti).first()
     if res:
         return True
     else:
