@@ -19,8 +19,9 @@ def login_parser():
 
 # helper for userRegistration
 def userRegister(username, email, password):
-    check_username = users.User.query.filter_by(username=username).first()
-    check_email = users.User.query.filter_by(email=email).first()
+    check_username = users.User.objects(username=username).first()
+    check_email = users.User.objects(email=email).first()
+    
     if check_username:
         raise exceptions.UsernameAlreadyExist
     elif check_email:
@@ -30,7 +31,8 @@ def userRegister(username, email, password):
         return user
 
 def userLogin(email, password):
-    user = users.User.query.filter_by(email=email).first()
+    user = users.User.objects(email=email).first()
+    
     if user:
         if users.verify_hash(password, user.password):
             return user
@@ -55,7 +57,7 @@ def userLogoutRefreshToken(jti):
 
 # helper for token refresh request
 def tokenRefresh(email):
-    user = users.User.query.filter_by(email=email).first()
+    user = users.User.objects(email=email).first()
     if user:
         return user
     else:
