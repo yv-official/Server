@@ -11,10 +11,10 @@ def register_parser():
     registerparser.add_argument('password', help = 'This Field Cannot be blank', required=True)
     registerparser.add_argument('firstName', help = 'This Field Cannot be blank', required=True)
     registerparser.add_argument('lastName')
-    registerparser.add_argument('gender')
+    registerparser.add_argument('gender', help = 'This Field Cannot be blank', required=True)
     registerparser.add_argument('phone')
-    registerparser.add_argument('branch')
-    registerparser.add_argument('year')
+    registerparser.add_argument('branch', help = 'This Field Cannot be blank', required=True)
+    registerparser.add_argument('year', help = 'This Field Cannot be blank', required=True)
     return registerparser
 
 def login_parser():
