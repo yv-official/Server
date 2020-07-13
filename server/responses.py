@@ -8,7 +8,7 @@ def userRegistrationSuccessful(user, access_token, refresh_token):
     res = make_response(
             jsonify({
                 'username': user.username,
-                'message': f"User with email {user.email} was created",
+                'msg': f"User with email {user.email} was created",
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }),201 
@@ -21,7 +21,7 @@ def userSuccessfulLogin(user, access_token, refresh_token):
             'userId': str(user.id),
             'username': user.username,
             'name': user.firstName + ' ' + user.lastName,
-            'message': f"Logged in as {user.username}",
+            'msg': f"Logged in as {user.username}",
             'access_token': access_token,
             'refresh_token': refresh_token,
         }),200)
@@ -73,7 +73,7 @@ def somethingWentWrong():
 def refreshTokenRevoked():
     res = make_response(
             jsonify({
-                'message': 'refresh token has been Revoked'
+                'msg': 'refresh token has been Revoked'
                 }),200
         )
     return res
@@ -82,7 +82,7 @@ def refreshTokenRevoked():
 def accessTokenRevoked():
     res = make_response(
             jsonify({
-                'message': 'Access token has been Revoked'
+                'msg': 'Access token has been Revoked'
                 }),200
         )
     return res
@@ -91,7 +91,7 @@ def accessTokenRevoked():
 def tokenRefresh(user, access_token):
     res = make_response(jsonify({ 
                 'username': user.username,
-                'message': f"Logged in as {user.email}",
+                'msg': f"Logged in as {user.email}",
                 'access_token': access_token,
             }),200
         )
