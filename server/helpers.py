@@ -9,16 +9,22 @@ def register_parser():
     registerparser.add_argument('username', help = 'This Field Cannot be blank', required=True)
     registerparser.add_argument('email', help = 'This Field Cannot be blank', required=True)
     registerparser.add_argument('password', help = 'This Field Cannot be blank', required=True)
+    registerparser.add_argument('firstName', help = 'This Field Cannot be blank', required=True)
+    registerparser.add_argument('lastName')
+    registerparser.add_argument('gender')
+    registerparser.add_argument('phone')
+    registerparser.add_argument('branch')
+    registerparser.add_argument('year')
     return registerparser
 
 def login_parser():
     loginparser = reqparse.RequestParser()
-    loginparser.add_argument('email', help='This Field Cannot be blank', required=True)
+    loginparser.add_argument('username', help='This Field Cannot be blank', required=True)
     loginparser.add_argument('password', help='This Field Cannot be blank', required=True)
     return loginparser
 
 # helper for userRegistration
-def userRegister(username, email, password):
+def userRegister(username, email, password, firstName, lastName, gender, phone, branch, year):
     check_username = users.User.objects(username=username).first()
     check_email = users.User.objects(email=email).first()
     
@@ -27,11 +33,21 @@ def userRegister(username, email, password):
     elif check_email:
         raise exceptions.EmailAlreadyExist
     else:
-        user = users.User(username=username, email=email, password=password)
+        user = users.User(
+            username=username, 
+            email=email, 
+            password=password,
+            firstName=firstName,
+            lastName=lastName,
+            gender=gender,
+            phone=phone,
+            branch=branch,
+            year=year
+        )
         return user
 
-def userLogin(email, password):
-    user = users.User.objects(email=email).first()
+def userLogin(username, password):
+    user = users.User.objects(username=username).first()
     
     if user:
         if users.verify_hash(password, user.password):

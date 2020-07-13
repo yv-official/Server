@@ -1,5 +1,6 @@
 # response if Username Already Exist
 from flask import jsonify,make_response
+import json
 
 
 # if user registered successfully 
@@ -17,18 +18,29 @@ def userRegistrationSuccessful(user, access_token, refresh_token):
 # response for Successful login
 def userSuccessfulLogin(user, access_token, refresh_token):
     res = make_response(jsonify({
+            'userId': str(user.id),
             'username': user.username,
-            'message': f"Logged in as {user.email}",
+            'name': user.firstName + ' ' + user.lastName,
+            'message': f"Logged in as {user.username}",
             'access_token': access_token,
             'refresh_token': refresh_token,
         }),200)
+    # res = make_response(json.dumps(user))
     return res
 
 # response for Authentication Failed
 def authenticationFailed():
     res = make_response(
             jsonify({
-                'error': 'Authentication failed'
+                'error': 'Authentication failed. Wrong Password'
+                }),401
+        )
+    return res
+
+def UserDoesNotExist():
+    res = make_response(
+            jsonify({
+                'error': 'No user found with that username'
                 }),401
         )
     return res

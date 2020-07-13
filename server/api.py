@@ -18,10 +18,16 @@ def register():
     username = data['username']
     email = data['email']
     password = users.generate_hash(data['password'])
+    firstName = data['firstName']
+    lastName = data['lastName']
+    gender = data['gender']
+    phone = data['phone']
+    branch = data['branch']
+    year = data['year']
 
     # try to Create User of the given information
     try:
-        user = helpers.userRegister(username, email, password)
+        user = helpers.userRegister(username, email, password, firstName, lastName, gender, phone, branch, year)
         
         # Add entry in DATABASE 
         user.save()
@@ -42,11 +48,11 @@ def register():
 # function for login
 def login():
     data = helpers.login_parser().parse_args()
-    email = data['email']
+    username = data['username']
     password = data['password']
 
     try:
-        user = helpers.userLogin(email, password)
+        user = helpers.userLogin(username, password)
     
         # access token
         access_token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))
@@ -58,7 +64,7 @@ def login():
     except exceptions.AuthenticationFailed:
         return responses.authenticationFailed()
     except exceptions.UserDoesNotExist:
-        return responses.authenticationFailed()
+        return responses.UserDoesNotExist()
 
 
 # function to revoke Access Token
@@ -95,4 +101,5 @@ def tokenRefresh():
     
     except exceptions.AuthenticationFailed:
         return responses.authenticationFailed()
+
 
