@@ -17,6 +17,10 @@ Back-end of HBTU Connect App
  
  ``` CORS origins are put under the /server/config.py in origins list ```
  
+ 3. to install all the dependencies.
+    
+    ``` pip install -r requirements.txt ```
+ 
  3. to run the app use the following command ``` flask run ```
  
  # API Specifications
