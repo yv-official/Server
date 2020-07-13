@@ -25,7 +25,6 @@ def userSuccessfulLogin(user, access_token, refresh_token):
             'access_token': access_token,
             'refresh_token': refresh_token,
         }),200)
-    # res = make_response(json.dumps(user))
     return res
 
 # response for Authentication Failed
