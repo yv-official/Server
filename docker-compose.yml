@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+  # service 1 named react-dev
+  flask-server:
+    container_name: flask-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ".:/server"
+    stdin_open: true # docker run -i
+    tty: true 
