@@ -101,9 +101,15 @@ def accessTokenRevoked():
 # response for token refresh request
 def tokenRefresh(user, access_token):
     res = make_response(jsonify({ 
-                'username': user.username,
-                'msg': f"Logged in as {user.email}",
-                'access_token': access_token,
+            'username': user.username,
+            'firstName': user.firstName,
+            'lastName': user.lastName,
+            'msg': f"Logged in as {user.username}",
+            'access_token': access_token,
+            'gender': user.gender,
+            'phone': user.phone,
+            'branch': user.branch,
+            'year': user.year
             }),200
         )
     return res
