@@ -103,4 +103,17 @@ def tokenRefresh():
         return responses.authenticationFailed()
 
 
+# Edit User Profile Details
+# def editUserProfileDetails():
+#     args = helpers.parseQueryArgs()
+#     username = args['username']
+
+#     data = helpers.userEditDetailsParser().parse_args()
+#     about = data['about']
+#     try:
+#         user = helpers.userEditDetails(username, about)
+
+    
+
+
 
