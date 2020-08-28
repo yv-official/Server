@@ -10,7 +10,13 @@ def userRegistrationSuccessful(user, access_token, refresh_token):
                 'username': user.username,
                 'msg': f"User with email {user.email} was created",
                 'access_token': access_token,
-                'refresh_token': refresh_token
+                'refresh_token': refresh_token,
+                'firstName': user.firstName,
+                'lastName': user.lastName,
+                'gender': user.gender,
+                'phone': user.phone,
+                'branch': user.branch,
+                'year': user.year
             }),201 
         )
     return res
@@ -20,10 +26,15 @@ def userSuccessfulLogin(user, access_token, refresh_token):
     res = make_response(jsonify({
             'userId': str(user.id),
             'username': user.username,
-            'name': user.firstName + ' ' + user.lastName,
+            'firstName': user.firstName,
+            'lastName': user.lastName,
             'msg': f"Logged in as {user.username}",
             'access_token': access_token,
             'refresh_token': refresh_token,
+            'gender': user.gender,
+            'phone': user.phone,
+            'branch': user.branch,
+            'year': user.year
         }),200)
     return res
 
@@ -31,7 +42,7 @@ def userSuccessfulLogin(user, access_token, refresh_token):
 def authenticationFailed():
     res = make_response(
             jsonify({
-                'error': 'Authentication failed. Wrong Password'
+                'msg': 'Authentication failed. Wrong Password'
                 }),401
         )
     return res
@@ -39,7 +50,7 @@ def authenticationFailed():
 def UserDoesNotExist():
     res = make_response(
             jsonify({
-                'error': 'No user found with that username'
+                'msg': 'No user found with that username'
                 }),401
         )
     return res
@@ -47,7 +58,7 @@ def UserDoesNotExist():
 def usernameAlreadyExist():
     res = make_response(
             jsonify({
-                'error': 'This Username is already taken!'
+                'msg': 'This Username is already taken!'
             }),401
         )
     return res
@@ -55,7 +66,7 @@ def usernameAlreadyExist():
 def emailAlreadyExist():
     res = make_response(
             jsonify({
-                'error': 'this email is already taken'
+                'msg': 'this email is already taken'
             }),401
         )
     return res
@@ -64,7 +75,7 @@ def emailAlreadyExist():
 def somethingWentWrong():
     res = make_response(
             jsonify({
-                'error': 'Something Went Wrong'
+                'msg': 'Something Went Wrong'
             }), 500 
         )
     return res
@@ -90,9 +101,15 @@ def accessTokenRevoked():
 # response for token refresh request
 def tokenRefresh(user, access_token):
     res = make_response(jsonify({ 
-                'username': user.username,
-                'msg': f"Logged in as {user.email}",
-                'access_token': access_token,
+            'username': user.username,
+            'firstName': user.firstName,
+            'lastName': user.lastName,
+            'msg': f"Logged in as {user.username}",
+            'access_token': access_token,
+            'gender': user.gender,
+            'phone': user.phone,
+            'branch': user.branch,
+            'year': user.year
             }),200
         )
     return res
