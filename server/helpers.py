@@ -1,4 +1,4 @@
-from flask_restful import reqparse
+from flask_restful import reqparse, request
 import server.Models.users as users
 import server.Models.jwtblacklist as jwtblacklist
 import server.exceptions as exceptions
@@ -78,5 +78,18 @@ def tokenRefresh(email):
         return user
     else:
         raise exceptions.AuthenticationFailed
-    
 
+#route query argument parser
+# def parseQueryArgs():
+#     args = request.args
+#     return args
+
+# #edit user details parser
+# def userEditDetailsParser():
+#     dataParser = reqparse.RequestParser()
+#     dataParser.add_argument('about')
+#     return dataParser
+
+# #edit user details helper
+# def userEditDetails(username, about):
+    
