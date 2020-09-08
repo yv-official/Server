@@ -16,3 +16,6 @@ class AuthenticationFailed(Error):
 class UserDoesNotExist(Error):
     """ Raised When User Does not exist """
     pass
+class NoTokenFound(Error):
+    """  Raised when no token found """
+    pass
