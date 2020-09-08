@@ -8,6 +8,8 @@ import server.responses as responses
 from flask_jwt_extended import jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt,create_access_token, create_refresh_token
 from datetime import datetime, timedelta
 
+import ast
+
 # Create blue print for API
 api = Blueprint('api', 'api', url_prefix='/api')
 
@@ -30,14 +32,8 @@ def register():
         user = helpers.userRegister(username, email, password, firstName, lastName, gender, phone, branch, year)
         
         # Add entry in DATABASE 
-        user.save()
-
-        # access_token
-        access_token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))
-        # refresh_token
-        refresh_token = create_refresh_token(identity = user.email)
-        
-        return responses.userRegistrationSuccessful(user, access_token, refresh_token)
+        user.save()        
+        return responses.userRegistrationSuccessful(user)
 
     except exceptions.UsernameAlreadyExist:
         return responses.usernameAlreadyExist()
@@ -50,16 +46,21 @@ def login():
     data = helpers.login_parser().parse_args()
     username = data['username']
     password = data['password']
-
+    rememberMe = data['rememberMe']
+    # print(username, password, rememberMe)
     try:
         user = helpers.userLogin(username, password)
     
         # access token
         access_token = create_access_token(identity=user.email, expires_delta=timedelta(days=1))
         #refresh token
-        refresh_token = create_refresh_token(identity = user.email)
+        # print(rememberMe == "True")
+        if rememberMe == "True":
+            refresh_token = create_refresh_token(identity = user.email)
+        else:
+            refresh_token = create_refresh_token(identity = user.email, expires_delta=timedelta(days=1))
 
-        return responses.userSuccessfulLogin(user, access_token, refresh_token)
+        return responses.userSuccessfulLogin(user, access_token, refresh_token, rememberMe)
     
     except exceptions.AuthenticationFailed:
         return responses.authenticationFailed()
@@ -67,25 +68,27 @@ def login():
         return responses.UserDoesNotExist()
 
 
-# function to revoke Access Token
-@jwt_required
-def logoutAccess():
-    jti = get_raw_jwt()['jti']
+# function to blacklist Access Token
+# @jwt_required
+# def logoutAccess():
+#     jti = get_raw_jwt()['jti']
     
-    try:
-        helpers.userLogoutAccessToken(jti)
-        return responses.accessTokenRevoked()
+#     try:
+#         helpers.userLogoutAccessToken(jti)
+#         return responses.accessTokenRevoked()
     
-    except exceptions.SomethingWentWrong:
-        return responses.somethingWentWrong()
+#     except exceptions.SomethingWentWrong:
+#         return responses.somethingWentWrong()
 
-# function to revoke Refresh Token
+    
+# backend will send us a repsonse with unsetted cookies in order to logout
 @jwt_refresh_token_required
-def logoutRefresh():
+def logout():
     jti = get_raw_jwt()['jti']
     try:
+        # will blacklist current refresh token
         helpers.userLogoutRefreshToken(jti)
-        return responses.refreshTokenRevoked()
+        return responses.logoutUser()
     
     except exceptions.SomethingWentWrong:
         return responses.somethingWentWrong()
@@ -94,24 +97,34 @@ def logoutRefresh():
 @jwt_refresh_token_required
 def tokenRefresh():
     email = get_jwt_identity()
+    print(email)
     try:
         user = helpers.tokenRefresh(email)
         access_token = create_access_token(identity = user.email, expires_delta=timedelta(days=1))
         return responses.tokenRefresh(user, access_token)
     
-    except exceptions.AuthenticationFailed:
-        return responses.authenticationFailed()
+    except exceptions.NoTokenFound:
+        return responses.noTokenFound()
 
+# function updating user details
+@jwt_required
+def updateDetails():
+    data = helpers.update_parser().parse_args()
+    newData = data['data']
+    newPrivacy = data['privacy']
 
-# Edit User Profile Details
-# def editUserProfileDetails():
-#     args = helpers.parseQueryArgs()
-#     username = args['username']
+    newData = ast.literal_eval(newData)
+    newPrivacy =  ast.literal_eval(newPrivacy)
+    
+    current_user_email = get_jwt_identity()
 
-#     data = helpers.userEditDetailsParser().parse_args()
-#     about = data['about']
-#     try:
-#         user = helpers.userEditDetails(username, about)
+    try:
+        user = helpers.updateUserDetails(current_user_email, newData, newPrivacy)
+        user.save()
+        return responses.userDetailsUpdated(user)
+    except exceptions.SomethingWentWrong:
+        return response.somethingWentWrong()
+
 
     
 
