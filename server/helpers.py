@@ -21,7 +21,14 @@ def login_parser():
     loginparser = reqparse.RequestParser()
     loginparser.add_argument('username', help='This Field Cannot be blank', required=True)
     loginparser.add_argument('password', help='This Field Cannot be blank', required=True)
+    loginparser.add_argument('rememberMe', help='This Field Cannot be blank', required=True)
     return loginparser
+
+def update_parser():
+    updateparser = reqparse.RequestParser()
+    updateparser.add_argument('data', help="This Field cannot be blank", required=True)
+    updateparser.add_argument('privacy', help="This Field cannot be blank", required=True)
+    return updateparser
 
 # helper for userRegistration
 def userRegister(username, email, password, firstName, lastName, gender, phone, branch, year):
@@ -45,6 +52,41 @@ def userRegister(username, email, password, firstName, lastName, gender, phone, 
             year=year
         )
         return user
+
+def updateUserDetails(user_email, data, privacy):
+
+    try:     
+        user = users.User.objects(email=user_email).first()
+        
+        handles = {}
+        try:
+            for handle in data.get('socialHandles'):
+                handles[handle['title']] = handle['content']
+        except:
+            pass
+        
+        about = users.About(
+            bio=data.get('bio'),
+            birthday=data.get('birthday'),
+            homeTown=data.get('homeTown'),
+            school=data.get("school"),
+            hostel=data.get("hostel"),
+            socialHandles=handles
+        )
+
+        settings = users.Settings(
+            privacy=privacy
+        )
+        
+        user.about = about
+        user.settings = settings
+    
+        return user
+    except:
+        raise exceptions.SomethingWentWrong
+
+
+
 
 def userLogin(username, password):
     user = users.User.objects(username=username).first()
@@ -77,19 +119,6 @@ def tokenRefresh(email):
     if user:
         return user
     else:
-        raise exceptions.AuthenticationFailed
+        raise exceptions.NoTokenFound
 
-#route query argument parser
-# def parseQueryArgs():
-#     args = request.args
-#     return args
-
-# #edit user details parser
-# def userEditDetailsParser():
-#     dataParser = reqparse.RequestParser()
-#     dataParser.add_argument('about')
-#     return dataParser
-
-# #edit user details helper
-# def userEditDetails(username, about):
     

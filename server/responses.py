@@ -2,41 +2,51 @@
 from flask import jsonify,make_response
 import json
 
+from flask_jwt_extended import (
+    set_access_cookies,
+    set_refresh_cookies,
+    unset_jwt_cookies
+)
+
+
+one_day = 60*60*24
+thirty_days = 60*60*24*30
 
 # if user registered successfully 
-def userRegistrationSuccessful(user, access_token, refresh_token):
+def userRegistrationSuccessful(user):
     res = make_response(
             jsonify({
                 'username': user.username,
                 'msg': f"User with email {user.email} was created",
-                'access_token': access_token,
-                'refresh_token': refresh_token,
-                'firstName': user.firstName,
-                'lastName': user.lastName,
-                'gender': user.gender,
-                'phone': user.phone,
-                'branch': user.branch,
-                'year': user.year
             }),201 
         )
     return res
 
 # response for Successful login
-def userSuccessfulLogin(user, access_token, refresh_token):
-    res = make_response(jsonify({
-            'userId': str(user.id),
-            'username': user.username,
-            'firstName': user.firstName,
-            'lastName': user.lastName,
-            'msg': f"Logged in as {user.username}",
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'gender': user.gender,
-            'phone': user.phone,
-            'branch': user.branch,
-            'year': user.year
-        }),200)
-    return res
+def userSuccessfulLogin(user, access_token, refresh_token, rememberMe):
+    res = jsonify({
+            "info":{
+                'userId': str(user.id),
+                'username': user.username,
+                'firstName': user.firstName,
+                'lastName': user.lastName,
+                'msg': f"Logged in as {user.username}",
+                'gender': user.gender,
+                'phone': user.phone,
+                'branch': user.branch,
+                'year': user.year,
+            },
+            "about": user.about.to_mongo(),
+            "privacy": user.settings.to_mongo()
+        })
+    set_access_cookies(res, access_token, max_age=one_day)
+    # print(type(rememberMe))
+    # print(rememberMe == "True")
+    if rememberMe == "True":
+        set_refresh_cookies(res, refresh_token, max_age=thirty_days)
+    else:
+        set_refresh_cookies(res, refresh_token, max_age=one_day)
+    return make_response(res,200)
 
 # response for Authentication Failed
 def authenticationFailed():
@@ -80,36 +90,46 @@ def somethingWentWrong():
         )
     return res
 
-# response for refresh token revoke request
-def refreshTokenRevoked():
+def noTokenFound():
     res = make_response(
-            jsonify({
-                'msg': 'refresh token has been Revoked'
-                }),200
-        )
+        jsonify({
+            'msg': 'No token found'
+        }), 301
+    )
     return res
 
-# Response for access token revoke request
-def accessTokenRevoked():
-    res = make_response(
-            jsonify({
-                'msg': 'Access token has been Revoked'
-                }),200
-        )
-    return res
+# response to logout user
+def logoutUser():
+    res = jsonify({
+        'msg':"User logged out"
+    })
+    unset_jwt_cookies(res)
+    return make_response(res,200)
+
 
 # response for token refresh request
 def tokenRefresh(user, access_token):
-    res = make_response(jsonify({ 
-            'username': user.username,
-            'firstName': user.firstName,
-            'lastName': user.lastName,
-            'msg': f"Logged in as {user.username}",
-            'access_token': access_token,
-            'gender': user.gender,
-            'phone': user.phone,
-            'branch': user.branch,
-            'year': user.year
-            }),200
-        )
-    return res
+    res = jsonify({ 
+            "info":{
+                'userId': str(user.id),
+                'username': user.username,
+                'firstName': user.firstName,
+                'lastName': user.lastName,
+                'msg': f"Logged in as {user.username}",
+                'gender': user.gender,
+                'phone': user.phone,
+                'branch': user.branch,
+                'year': user.year
+                },
+            "about": user.about.to_mongo(),
+            "privacy": user.settings.to_mongo()
+            })
+    set_access_cookies(res, access_token, max_age=one_day)
+    return make_response(res,200)
+
+def userDetailsUpdated(user):
+    res = jsonify({
+        "about": user.about.to_mongo(),
+        "privacy": user.settings.to_mongo()
+    })
+    return make_response(res,200)

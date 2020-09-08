@@ -3,19 +3,19 @@ from datetime import datetime
 from passlib.hash import pbkdf2_sha256 as sha256
 
 class About(db.EmbeddedDocument):
-    bio: db.StringField(default="Hey, I'm using HBTU Connect")
-    birthday: db.StringField()
-    hostel: db.StringField()
-    homeTown: db.StringField()
-    school: db.StringField()
-    socialHandles: db.DictField()
+    bio = db.StringField(default="Hey, I'm using HBTU Connect")
+    birthday = db.StringField(default=None)
+    hostel = db.StringField(default=None)
+    homeTown = db.StringField(default=None)
+    school = db.StringField(default=None)
+    socialHandles = db.DictField(default=None)
 
 class Settings(db.EmbeddedDocument):
-    privacy: db.DictField(default={"email": 'private', "phone": 'private', "bio": 'public', "birthday": 'connections', "homeTown": 'public', "school": 'connections', "hostel": 'public', "socialHandles": {}})
+    privacy = db.DictField(default={"email": 'private', "phone": 'private', "bio": 'public', "birthday": 'connections', "homeTown": 'public', "school": 'connections', "hostel": 'public', "socialHandles": {}})
 
 class User(db.Document):
-    firstName = db.StringField()
-    lastName = db.StringField()
+    firstName = db.StringField(default=None)
+    lastName = db.StringField(default=None)
     username = db.StringField(unique=True)
     email = db.EmailField(unique=True)
     password = db.StringField()
@@ -25,8 +25,8 @@ class User(db.Document):
     year = db.StringField(max_length=10)
     newUser = db.BooleanField(default=True)
 
-    about = db.EmbeddedDocumentField(About)
-    settings = db.EmbeddedDocumentField(Settings)
+    about = db.EmbeddedDocumentField(About, default=About)
+    settings = db.EmbeddedDocumentField(Settings, default=Settings)
     # connections = db.ListField(db.ReferenceField(User))
 
 
